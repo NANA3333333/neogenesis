@@ -1,0 +1,303 @@
+:root { 
+    --bg-deep: #050510;
+    --panel-bg: rgba(15, 20, 35, 0.9); /* 稍微加深底色，提高文字对比度 */
+    --neon-blue: #00f3ff;
+    --neon-pink: #bc13fe;
+    --neon-gold: #ffd700;
+    --neon-green: #0aff60;
+    --text-main: #e0faff;
+}
+
+/* === 🌌 赛博星云·动态背景 === */
+body {
+    font-family: 'Segoe UI', 'Roboto', 'Microsoft YaHei', sans-serif;
+    margin: 0; padding: 20px;
+    min-height: 100vh;
+    color: var(--text-main);
+    display: flex; flex-direction: column; align-items: center;
+    overflow-x: hidden;
+    font-size: 16px; /* 🔥 核心修改：全局字体加大 */
+
+    background-color: var(--bg-deep);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(188, 19, 254, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.2) 0%, transparent 40%),
+        linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+    background-attachment: fixed;
+    animation: nebula-pulse 10s infinite alternate;
+}
+
+body::after {
+    content: ""; position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px; z-index: -1; pointer-events: none;
+}
+@keyframes nebula-pulse { 0% { background-size: 100% 100%; } 100% { background-size: 110% 110%; } }
+
+/* === 💎 宽屏布局 === */
+.header, .main-container, .log-panel, .resource-bar { 
+    width: 95%; max-width: 1400px; margin-bottom: 25px; 
+}
+
+.panel, .resource-bar, .log-panel, .modal-content {
+    background: var(--panel-bg);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1), inset 0 0 30px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    padding: 25px; /* 加大内边距 */
+    position: relative;
+}
+
+/* 装饰光条 */
+.panel::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
+    animation: scan-line 3s infinite linear;
+}
+@keyframes scan-line { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+/* === 🧬 大号标题与文字 === */
+h1 { 
+    font-size: 2.4rem; /* 加大 */
+    margin: 0; 
+    background: linear-gradient(to right, #fff, var(--neon-blue));
+    -webkit-background-clip: text; color: transparent;
+    text-shadow: 0 0 20px rgba(0,243,255,0.6);
+}
+h3 { font-size: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; color: var(--neon-blue); margin-bottom: 20px; }
+
+/* === 📜 滚动日志 (加大字号) === */
+.log-content {
+    background: rgba(0, 10, 20, 0.8);
+    border: 1px solid #333;
+    border-left: 4px solid var(--neon-green);
+    border-radius: 6px;
+    padding: 15px;
+    font-family: 'Consolas', monospace;
+    font-size: 14px; /* 加大 */
+    color: var(--neon-green);
+    text-shadow: 0 0 5px rgba(10, 255, 96, 0.4);
+    height: 180px; /* 加高 */
+    overflow-y: auto;
+    line-height: 1.6;
+}
+.log-content::-webkit-scrollbar { width: 8px; }
+.log-content::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
+
+/* === 🧬 卡片与网格 === */
+.grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); /* 加宽卡片 */
+    gap: 15px; 
+}
+
+.card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+}
+.card:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); transform: translateY(-5px); z-index: 10; }
+.card.focused { border-color: var(--neon-gold); box-shadow: 0 0 20px var(--neon-gold); background: rgba(255, 215, 0, 0.1); }
+.card.in-fusion { opacity: 0.5; filter: grayscale(1); }
+
+/* 💀 死亡卡片样式 */
+.card.dead { 
+    filter: grayscale(1); 
+    opacity: 0.7; 
+    border: 2px solid #f44; /* 明显的红框 */
+    background: rgba(50, 0, 0, 0.3);
+}
+.card.dead::after {
+    content: '已死亡';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 14px; font-weight: bold; color: #f44;
+    border: 1px solid #f44; padding: 2px 5px;
+    background: rgba(0,0,0,0.8);
+    pointer-events: none;
+}
+
+/* 小球 */
+.ball-wrapper { width: 60px; height: 60px; position: relative; margin: 10px auto; background: #000; border-radius: 50%; box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+.ball-wrapper.big { width: 120px; height: 120px; }
+.ball { width: 100%; height: 100%; border-radius: 50%; position: absolute; inset:0; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8); z-index: 5; }
+
+/* === 🔘 按钮加大 === */
+button {
+    background: rgba(0,0,0,0.3); color: var(--neon-blue);
+    border: 1px solid var(--neon-blue);
+    padding: 10px 20px; /* 加大 */
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold; font-size: 14px;
+    text-transform: uppercase; transition: 0.3s;
+    box-shadow: 0 0 5px rgba(0,243,255,0.1);
+}
+button:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 20px var(--neon-blue); }
+.danger-btn { color: #f44; border-color: #f44; }
+.danger-btn:hover { background: #f44; color: #fff; box-shadow: 0 0 20px #f44; }
+
+.btn-breed { width: 100%; padding: 18px; margin-top: 20px; font-size: 18px; letter-spacing: 2px; }
+.btn-breed.ready { background: linear-gradient(45deg, var(--neon-blue), #0055ff); color: #fff; border: none; animation: glow 2s infinite; }
+.btn-breed.danger { background: linear-gradient(45deg, #ff0055, #ff4400); border: none; color: white; }
+.btn-breed.disabled { background: #222; border: 1px solid #444; color: #555; cursor: not-allowed; }
+@keyframes glow { 0%{box-shadow:0 0 5px var(--neon-blue)} 50%{box-shadow:0 0 25px var(--neon-blue)} 100%{box-shadow:0 0 5px var(--neon-blue)} }
+
+/* === 🛠️ 其他 === */
+.hidden { display: none !important; }
+.resource-bar { justify-content: center; font-size: 26px; color: var(--neon-gold); text-shadow: 0 0 15px var(--neon-gold); border-color: var(--neon-gold); }
+.slot-box { display: flex; justify-content: center; gap: 25px; margin-bottom: 25px; }
+.slot { width: 100px; height: 140px; border: 1px dashed rgba(255,255,255,0.3); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.slot.filled { border: 1px solid var(--neon-blue); background: rgba(0, 243, 255, 0.1); box-shadow: inset 0 0 20px rgba(0,243,255,0.2); }
+.slot-remove { position: absolute; top: -10px; right: -10px; background: #f44; color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; line-height: 24px; display: none; cursor: pointer; z-index: 20; box-shadow: 0 0 10px #f00; }
+.slot.filled .slot-remove { display: block; }
+
+#overlay, #modal, #tree-modal, #help-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+.modal-content { max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--neon-blue); box-shadow: 0 0 60px rgba(0,243,255,0.2); }
+.close-btn { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #fff; transition: 0.3s; }
+.close-btn:hover { color: var(--neon-pink); transform: rotate(90deg); }
+.gene-map-box { display: flex; justify-content: center; gap: 20px; background: #000; padding: 20px; border-radius: 8px; border: 1px solid #333; margin: 15px 0; font-family: 'Courier New', monospace; font-size: 16px; color: #ddd; white-space: nowrap; overflow-x: auto; box-shadow: inset 0 0 20px #000; }
+.drama-box { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: rgba(255, 0, 0, 0.8); border: 2px solid #f00; padding: 15px 30px; border-radius: 50px; font-weight: bold; color: white; text-shadow: 0 0 5px #000; z-index: 2000; pointer-events: none; transition: opacity 0.5s; opacity: 0; box-shadow: 0 0 30px #f00; font-size: 18px; }
+.drama-box.show { opacity: 1; }
+.info-icon { position: absolute; top: 5px; right: 5px; width: 18px; height: 18px; background: #555; border-radius: 50%; font-size: 11px; text-align: center; line-height: 18px; color: #fff; z-index: 5; }
+
+/* === 🧬 核心特效库 (不要动！) === */
+.fx-scourge { overflow: visible !important; }
+.fx-scourge::before { content:''; position:absolute; inset:2px; border-radius:50%; background:radial-gradient(circle, #f0f, #300); mix-blend-mode:hard-light; animation:p 1s infinite alternate; z-index: 3; }
+.fx-scourge::after { content:''; position:absolute; inset:-4px; border-radius:45%; border:2px dashed #f05; animation:r 4s linear infinite; z-index: 4; }
+.fx-plasma::before { content:''; position:absolute; inset:-3px; border-radius:50%; border:2px solid var(--neon-blue); animation:r 2s linear infinite; }
+.fx-void-core { background:#000 !important; box-shadow:inset 0 0 20px #000; }
+.fx-void-core::after { content:''; position:absolute; inset:-5px; border-radius:50%; background:radial-gradient(transparent, #000); box-shadow:0 0 10px #408; animation:p 2s infinite; }
+.fx-radiant { box-shadow:0 0 20px var(--neon-gold); border:2px solid #fff !important; }
+.fx-glitch-heavy { clip-path:polygon(0 0, 100% 0, 100% 80%, 0 100%); animation:p 0.1s infinite; filter:contrast(2); }
+.fx-crystal { background-image:conic-gradient(from 0deg, rgba(255,255,255,0.5), transparent) !important; border:1px solid rgba(255,255,255,0.5) !important; }
+.fx-neon { box-shadow:0 0 8px 2px currentColor; border:2px solid #fff !important; }
+.fx-pixel { image-rendering:pixelated; box-shadow:inset 0 0 0 2px #000; }
+.shape-square { border-radius: 10% !important; }
+.shape-pill { border-radius: 50px/20px !important; }
+.shape-diamond { transform: rotate(45deg) scale(0.8); border-radius: 10% !important; }
+.def-cyclops::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:35%; height:35%; background:#000; border:2px solid #fff; border-radius:50%; z-index: 11; box-shadow: 0 0 5px #f00; }
+.def-withered { transform:scale(0.7); filter:grayscale(0.8); border:1px dashed #666 !important; }
+.def-meltdown { border-radius:40% 60% 70% 30% / 50%; animation:p 0.5s infinite; filter:hue-rotate(90deg); box-shadow: 0 0 15px #0f0; }
+@keyframes p { 0%{opacity:0.7; transform:scale(0.95)} 100%{opacity:1; transform:scale(1.05)} }
+@keyframes r { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+.shake-hard { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
+/* =========================================
+   🔧 V41.1 - 界面尺寸微调补丁
+   (把这段加到 style.css 最底部即可生效)
+   ========================================= */
+
+/* 1. 调整【资金栏】(顶部那条) */
+.resource-bar {
+    /* ⬆️ 高度调整：增加上下内边距 (原来可能是 15px) */
+    padding-top: 25px !important;
+    padding-bottom: 25px !important;
+
+    /* ↔️ 宽度调整：让它占满屏幕宽度的百分比 */
+    width: 95% !important; 
+    max-width: 1600px !important; /* 最大宽度限制，防止在超大屏幕太长 */
+    
+    /* 字体大小微调 */
+    font-size: 28px !important; 
+}
+
+/* 2. 调整【中间大容器】(包含左边繁育+右边样本库) */
+.main-container {
+    width: 98% !important;
+    max-width: 1600px !important;
+    
+    /* 这里的 display: flex 是关键，决定了左右两边的比例 */
+    display: flex;
+    gap: 20px; /* 左右两个框中间的缝隙 */
+}
+
+/* 3. 调整【左侧：繁育舱】 */
+.left-panel {
+    /* ↔️ 宽度权重：1份 */
+    flex: 1; 
+    
+    /* 强制最小宽度，防止被压扁 */
+    min-width: 350px !important; 
+}
+
+/* 4. 调整【右侧：样本收容所】(你要调的那个框框) */
+.right-panel {
+    /* ↔️ 宽度权重：改为 3 (意思是它比左边宽 3 倍！) */
+    /* 你可以改成 2 或 4 试试效果 */
+    flex: 3 !important; 
+
+    /* ↕️ 高度控制：设置一个最小高度，让它看起来更霸气 */
+    min-height: 600px !important; 
+}
+
+/* 5. 调整【底部：探索控制台】 */
+.log-panel {
+    width: 95% !important;
+    max-width: 1600px !important;
+    
+    /* 让日志框本身也变高一点 */
+    height: auto !important;
+}
+
+/* 让日志滚动的区域更高 */
+.log-content {
+    height: 250px !important; /* 原来是 150px，现在能看更多行 */
+}
+/* =========================================
+   🔧 V42.0 - 旗舰级导航栏修复补丁
+   (请粘贴到 style.css 最底部，覆盖之前所有 header 样式)
+   ========================================= */
+
+/* 1. 强制重构 Header 容器 */
+.header {
+    display: flex !important;
+    justify-content: center !important; /* 整个容器居中 */
+    padding: 20px !important;
+    height: auto !important;
+}
+
+/* 2. 重置内部 div 的布局 (覆盖 HTML 内联样式) */
+.header > div {
+    display: flex !important;
+    flex-direction: row !important;     /* 强制横向排列 */
+    align-items: center !important;     /* 垂直居中对齐 */
+    justify-content: center !important; /* 内容居中 */
+    gap: 40px !important;               /* 标题和按钮组之间的间距，拉开一点才大气 */
+    width: 100% !important;
+    flex-wrap: wrap !important;         /* 屏幕太小自动换行，防挤爆 */
+}
+
+/* 3. 标题样式微调 */
+.header h1 {
+    margin: 0 !important;
+    text-align: right !important;       /* 标题靠右一点，呼应按钮 */
+    font-size: 2.2rem !important;
+    line-height: 1 !important;
+}
+
+/* 4. 按钮组样式 */
+.header .btn-group {
+    position: static !important;        /* 彻底取消定位 */
+    transform: none !important;
+    margin: 0 !important;
+    
+    display: flex !important;
+    gap: 15px !important;               /* 按钮之间的间距 */
+    align-items: center !important;
+}
+
+/* 5. 手机端适配 (万一你缩放浏览器) */
+@media (max-width: 850px) {
+    .header > div {
+        flex-direction: column !important; /* 屏幕太窄时才变竖排 */
+        gap: 20px !important;
+    }
+}

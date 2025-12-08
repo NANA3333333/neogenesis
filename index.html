@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>NeoGenesis: 终极发布版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="game-body">
+    
+    <div id="overlay" class="hidden">
+        <div class="mutation-box">
+            <h2 class="gold-text">✨ 样本异化确认 ⚡</h2>
+            <div id="mut-stage" class="ball-wrapper big"></div>
+            <h3 id="mut-title"></h3>
+            <div id="mut-desc" style="color:#aaa; font-size:14px; margin-bottom:20px;"></div>
+            <button id="btn-close-overlay">执行收容程序</button>
+        </div>
+    </div>
+
+    <div id="drama-bubble" class="hidden drama-box"><div id="drama-text"></div></div>
+
+    <div id="modal" class="hidden"><div class="modal-content"><span id="btn-close-modal" class="close-btn">×</span><div id="modal-body"></div></div></div>
+    <div id="tree-modal" class="hidden"><div class="modal-content wide"><span id="btn-close-tree" class="close-btn">×</span><h2 style="text-align:center">🧬 基因演化图谱</h2><div id="tree-box" class="tree-container"></div></div></div>
+
+    <div id="help-modal" class="hidden">
+        <div class="modal-content">
+            <span id="btn-close-help" class="close-btn">×</span>
+            <h2 style="text-align:center; color:var(--accent); margin-bottom:20px;">📖 管理员操作手册</h2>
+            <div class="help-section">
+                <div class="help-title">🏛️ 世界观简介</div>
+                <div class="help-text">
+                    废土末世，人类文明崩塌。作为 <b>NeoGenesis 避难所</b> 的 AI 管理员，你患有严重的视觉认知障碍，幸存的人类在你眼中只是抽象的<b>球体</b>。<br>
+                    你的使命是理智、冷酷地通过<b>基因融合</b>延续文明火种，哪怕这意味着要进行违背伦理的近亲实验。
+                </div>
+            </div>
+            <div class="help-section">
+                <div class="help-title">🖱️ 操作指南</div>
+                <div class="help-text">
+                    <ul>
+                        <li><span class="key-highlight">点击样本</span>：选中该个体。它会自动进入左侧<b>融合舱</b>等待配对，同时也成为下方<b>探索任务</b>的指定专员。</li>
+                        <li><span class="key-highlight">启动融合协议</span>：当融合舱有一男一女时可用。近亲繁殖会有高风险（基因熔毁），但也可能带来稀有突变。</li>
+                        <li><span class="key-highlight">地表任务</span>：消耗资金派遣选中样本去探索。
+                            <ul>
+                                <li><b>🌲 安全区</b>：低风险，捡垃圾换钱。</li>
+                                <li><b>☢️ 废土深处</b>：高辐射高死亡率，但能捡到<b>野生幸存者</b>（净化基因的唯一希望）。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="help-section">
+                <div class="help-title">⚠️ 警告</div>
+                <div class="help-text">
+                    若资金耗尽且无存活样本，系统将启动<b>低保协议</b>。样本库初始容量为 5，请及时赚钱扩容或<b>无害化处理（卖掉）</b>低价值样本。
+                </div>
+            </div>
+            <button onclick="document.getElementById('help-modal').classList.add('hidden')" style="width:100%; background:var(--accent); color:black; border:none;">我已了解</button>
+        </div>
+    </div>
+
+    <div class="header">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <h1>🏛️ NeoGenesis <span style="font-size:14px; color:rgba(255,255,255,0.5); font-weight:normal;">v1.0 Release</span></h1>
+        </div>
+        <div class="btn-group">
+            <button id="btn-help" style="border-color:var(--accent); color:var(--accent);">? 帮助</button>
+            <button id="btn-wiki">📘 图鉴</button>
+            <button id="btn-tree">🌳 族谱</button>
+            <button id="btn-reset" class="danger-btn">💀 重置</button>
+        </div>
+    </div>
+
+    <div class="resource-bar">
+        <div style="display:flex; align-items:center;">
+            <span>🪙 资金: <b id="res-gold" style="color:gold; font-size:24px;">2000</b></span>
+        </div>
+        <div>
+            <button id="btn-expand" style="border-color:gold; color:gold;">➕ 样本库扩容 (1000$)</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="panel left-panel">
+            <h3>🧫 基因融合协议</h3>
+            <div class="slot-box">
+                <div id="slot-M" class="slot" data-sex="M"><span>♂ A</span></div>
+                <div class="plus">+</div>
+                <div id="slot-F" class="slot" data-sex="F"><span>♀ B</span></div>
+            </div>
+            <div id="dashboard" class="dashboard hidden">
+                <div>异化率: <span id="val-chance">0%</span></div>
+                <div>基因锁: <span id="val-genes">--</span></div>
+                <div>风险: <span id="val-risk" style="color:orange">--</span></div>
+            </div>
+            <button id="btn-breed" class="btn-breed disabled">等待样本装载...</button>
+        </div>
+
+        <div class="panel right-panel">
+            <div class="panel-header">
+                <h3>样本收容所 (<span id="count">0</span> / <span id="max-slots">5</span>)</h3>
+                <div class="filter-bar">
+                    <button class="filter active" data-filter="all">全部</button>
+                    <button class="filter" data-filter="M" style="color:#00e5ff">♂</button>
+                    <button class="filter" data-filter="F" style="color:#e91e63">♀</button>
+                    <button class="filter" data-filter="alive">存活</button>
+                </div>
+            </div>
+            <div id="lair" class="grid"></div>
+        </div>
+    </div>
+
+    <div class="panel log-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3>🌍 地表任务指派 <span style="font-size:12px; color:#888; font-weight:normal;">(单次消耗 100$)</span></h3>
+            <div id="explore-btns">
+                <button class="exp-btn safe" onclick="startExplore('forest')">🌲 安全区 (低险)</button>
+                <button class="exp-btn danger" onclick="startExplore('waste')">☢️ 废土深处 (极危)</button>
+            </div>
+        </div>
+        <div id="explore-target" style="font-size:14px; color:#aaa; margin-bottom:10px; border-left: 3px solid #666; padding-left: 10px;">
+            当前指派: <span style="color:#666">未选择 (请点击上方样本)</span>
+        </div>
+        <div id="log-box" class="log-content">
+            <div class="log-entry">> 终端系统启动...</div>
+            <div class="log-entry">> 认知滤网已激活。</div>
+            <div class="log-entry">> 等待管理员指令。</div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
